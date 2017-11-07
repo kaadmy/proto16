@@ -29,10 +29,10 @@ add_subdirectory(src/vm)
 set(VM_LIBRARIES vm)
 
 add_subdirectory(src/renderer)
-set(VM_LIBRARIES renderer)
+set(RENDERER_LIBRARIES renderer)
 
 add_subdirectory(src/sound)
-set(VM_LIBRARIES sound)
+set(SOUND_LIBRARIES sound)
 
 add_subdirectory(src/main)
 
