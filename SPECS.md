@@ -1,7 +1,5 @@
 
-Specifications for Proto16.
-
-***
+Specification sheet for Proto16.
 
 # Hardware
 
@@ -13,38 +11,40 @@ Specifications for Proto16.
 
 ## GPU
 
-- Scaled sprite rendering
+- Scaled sprite rendering (Up to 32x32 resolution)
 - Triangle rendering
-- Microcode cache: 4KB
 
 The color and depth buffers are only written to via microcode and read only when flushing the buffer(s) to the screen.
 
 ### Microcode
 
-Run on every rendered pixel with these inputs:
+Microcode is a data block in VRAM, and it is run on every rendered pixel with these inputs:
 
 - Pixel index (u16)
 - Pixel color (Depends)
 - Pixel depth (u8)
 - Direction ratio (u8) (Ratio of surface area to visible area)
 
-And has access to RAM (Including the color buffer)
+And has access to VRAM (But not RAM)
 
 ## Memory
 
-- ROM cartridge: 16MB at 300MB/s
+- ROM cartridge: 32MB at 300MB/s
 - Persistent storage: 16KB
 - RAM: 64KB at 600MB/s
 - VRAM: 64KB internal
 
 ## Controls
 
-- Start
-- Select
-- A
-- B
-- C
-- D-pad
+Uses are optional and simply a recommendation.
+If an action ingame fits a use listed below, you should use it for consistency if possible.
+
+- `Start`: Pause/menu
+- `Select`: Game-related menu (Inventory, weapons, etc.)
+- `A`: Primary action (Shoot, attack)
+- `B`: Secondary action (Use, interact)
+- `C`: Mechanic/modifier (Hold to interact with the D-pad)
+- `D-pad`: 4 directional buttons (Movement etc.)
 
 ## Graphics
 
@@ -54,16 +54,14 @@ And has access to RAM (Including the color buffer)
 
 Color modes are global across ALL rendering including sprites and the color buffer
 
-- I1 (1-bit indexed)
-- I4 (4-bit indexed, index 0 is alpha)
-- I8 (8-bit indexed, index 0 is alpha)
+- `I1`: 1-bit indexed
+- `I4`: 4-bit indexed, index 0 is alpha
+- `I8`: 8-bit indexed, index 0 is alpha
 
 ## Audio
 
 - 8KHz 16-bit samples
 - Channels: 4 (Mono)
-
-***
 
 # Software
 
@@ -73,7 +71,7 @@ Names can contain `[_a-zA-Z0-9]` but must start with `[_a-zA-Z]`.
 
 Any line beginning with period (`.`) is a preprocesser directive, aka pseudo-op.
 
-Constants are numbers statically compiled (They have no address) and start with `[0-9]`
+Constants are numbers statically compiled (They have no address) and start with `[-0-9]`
 If a constant starts with `0x` it is a hexidecimal number. For example `0x21`.
 If a constant starts with `0o` it is an octal number. For example `0o41`.
 
@@ -85,7 +83,7 @@ Operands can be one of:
 
 Operands wrapped in brackets (`[]`) are pointers and are in the format `[ptr]` or `[ptr:offset]`, where `offset` is an offset in bytes from `ptr`.
 
-If an operand starts with `>` followed immediately by a type, the operand will be treated as that type, if applicable.
+If an operand starts with greater than sign  (`>`) followed immediately by a type, the operand will be treated as that type, if applicable.
 
 Labels are defined by a valid symbol name with a colon (`:`) appended to it.
 
@@ -93,7 +91,7 @@ If a line has an unescaped pound sign (`#`), the rest of the line is ignored and
 
 ## Pointers
 
-Pointers are for accessing RAM.
+Pointers are for accessing RAM (Or VRAM, in the case of microcode)
 
 ## Data types
 
@@ -103,6 +101,8 @@ Data sizes:
 - `byte`: 8-bit value
 - `word`: 16-bit value
 
+Registers have a fixed size and cannot be type cast.
+
 ### Example syntax
 
 ```
@@ -110,13 +110,28 @@ Data sizes:
 
 .segment data
 message:
-.data bytes "Hello, world!"
+.data bytes, "Hello, world!"
 message_len:
-.expr sub message_len message
+.expr sub, message_len, message
 
 .segment code
 _start:
-    mov dl, 2 # Random number... interrupt
+    mov dl, 4 # Random number for now; GPU command index for caching a sprite
+    mov ax, [0x7d3a:0x4b2f] # Pointer to the start of the sprite data in ROM
+    int 7 # Random number; GPU interrupt
+
+    mov dl, 5 # Random number for now; GPU command index for pushing AX to the draw parameters
+    mov ax, 40 # X position of sprite
+    int 7
+    mov ax, 20 # Y position of sprite
+    int 7
+    mov ax, 511 # X scale of sprite (0.0 to 1.0 is mapped as 0-255, negative numbers flip this axis)
+    int 7
+    mov ax, 255 # Y scale of sprite
+    int 7
+
+    mov dl, 6 # Random number for now; GPU command index for drawing a sprite
+    int 7
 ```
 
 ## Stack
@@ -129,37 +144,37 @@ The stack uses LIFO ordering and can hold 128 16-bit values.
 
 4x 16-bit
 
-- AX
-- BX
-- CX
-- DX
+- `AX`
+- `BX`
+- `CX`
+- `DX`
 
 8x 8-bit (2 per 16-bit register):
 
-- AL (Least significant half)
-- AH (Most significant half)
-- BL
-- BH
-- CL
-- CH
-- DL
-- DH
+- `AL` (Least significant half)
+- `AH` (Most significant half)
+- `BL`
+- `BH`
+- `CL`
+- `CH`
+- `DL`
+- `DH`
 
 ### Miscellaneous registers
 
-- BP (Stack base pointer; used for subroutine stack state)
-- SP (Stack pointer; current stack pointer)
-- IP (Current instruction address)
+- `BP` (Stack base pointer; used for subroutine stack state)
+- `SP` (Stack pointer; current stack pointer)
+- `IP` (Current instruction address)
 
 ### Flag register
 
-- FLAGS (16-bit status flags)
-  - 0: ZF (Zero flag)
-  - 1: CF (Carry flag)
-  - 2: SF (Sign flag)
-  - 3: OF (Overflow flag)
+- `FLAGS` (16-bit status flags)
+  - 0: `ZF` (Zero flag)
+  - 1: `CF` (Carry flag)
+  - 2: `SF` (Sign flag)
+  - 3: `OF` (Overflow flag)
 
-  - 8: DF (Direction flag)
+  - 8: `DF` (Direction flag)
 
 ## Pseudo-opcodes
 
@@ -186,7 +201,7 @@ Directly copies another file into the current file at compile time.
 
 Replaces a name with a value at compile time.
 
-### `.data <type> <data>`
+### `.data <type>, <data>`
 
 Insert a block of raw data, the length is determined by the data sequence until the end of the line and is in the format of a string or an arbitrary amount of comma seperated constants.
 
@@ -195,16 +210,6 @@ Type is a data size type.
 ### `.zero <length>`
 
 Pad a chunk of data with zeroes, mainly applicable in the data segment.
-
-### `.if <cond>`
-
-Compile-time condition that depends on constants or defines.
-
-Can be nested.
-
-### `.endif`
-
-Exit the previous if statement.
 
 ## Opcodes
 
@@ -224,9 +229,12 @@ No-op.
 
 Interrupt request.
 
+Interrupts read data from *DX*, the exact type and what formt of the data depends on the interrupt.
+If an interrupt requires a secondary command index it is read from *DL*.
+
 ### `LEA <dest>, <src>`
 
-Copies a memory pointer to another memory pointer (Typically to or from a register).
+Copies a memory pointer to a register.
 
 ### `MOVE <dest>, <src>`
 
@@ -329,14 +337,14 @@ Result placed in dest.
 Save state and jump to a pointer or label.
 
 - *IP* is pushed to the stack
-- *ESP* is pushed to the stack
+- *SP* is pushed to the stack
 - Jump to pointer
 
 ### `RET`
 
 Jump back to the calling instruction.
 
-- Value is popped from the stack into *ESP*
+- Value is popped from the stack into *SP*
 - *IP* is popped from the stack
 - Jump to *IP*
 
@@ -348,22 +356,30 @@ Jump to a pointer or label.
 
 Conditional jump.
 
+Flag conditionals:
+
 - JZ: `ZF == 1`
 - JNZ: `ZF == 0`
+- JC: `CF == 1`
+- JNC: `CF == 0`
 - JS: `SF == 1`
 - JNS: `SF == 0`
 - JO: `OF == 1`
 - JNO: `OF == 0`
-- JC: `CF == 1`
-- JNC: `CF == 0`
-- JB: (Jump below)
-- JBE: (Jump below or equal)
-- JAE: (Jump above or equal)
-- JA: (Jump above)
+
+Unsigned integer conditionals:
+
+- JB: `CF == 1`
+- JBE: `(CF == 1) || (ZF == 1)`
+- JAE: `CF == 0`
+- JA: `(CF == 0) && (ZF == 0)`
+
+Signed integer conditionals:
+
 - JL: `SF != OF`
-- JLE: `(SF != OF) || ZF`
+- JLE: `(SF != OF) || (ZF == 1)`
 - JGE: `SF == OF`
-- JG: `(SF == OF) && !ZF`
+- JG: `(SF == OF) && (ZF == 0)`
 
 ### `PUSH <src>`
 
@@ -389,6 +405,6 @@ Pop FLAGS from the stack.
 
 Pop all 4 data registers from the stack in the order *DCBA*.
 
-### `LOOP <ptr>`
+### `LOOP <reg> <ptr>`
 
-As long as *ECX* is not zero, decrement *ECX* by one, then jump to a pointer or label.
+As long as the register is not zero, decrement the register by one, then jump to a pointer.
