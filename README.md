@@ -3,8 +3,19 @@
 
 A 16-bit fantasy console.
 
-Made in 14 days (Nov 6, 2017 to Nov ??, 2017) for the FC dev jam.
-(Currently unfinished, deadline is Nov 18, 2017)
+# Jam
+
+**Currently unfinished, latest possible deadline is Nov 30, 2017**
+
+Made within 14 days for a fantasy console development jam.
+
+Development days:
+
+- Nov 6, 2017
+- Nov 7, 2017
+- Nov ??, 2017
+
+Note: When the jam is over, I'll probably fork Proto16 into Proto32 as a 32-bit console more akin to 5th gen consoles such as the N64 and PS1.
 
 # License
 

@@ -20,7 +20,7 @@ The color and depth buffers are only written to via microcode and read only when
 
 Microcode is a data block in VRAM, and it is run on every rendered pixel with these inputs:
 
-- Pixel index (u16)
+- Pixel index (u32)
 - Pixel color (Depends)
 - Pixel depth (u8)
 - Direction ratio (u8) (Ratio of surface area to visible area)
@@ -29,10 +29,10 @@ And has access to VRAM (But not RAM)
 
 ## Memory
 
-- ROM cartridge: 32MB at 300MB/s
-- Persistent storage: 16KB
+- ROM cartridge: 64MB at 300MB/s
+- Persistent storage: 32KB at 150MB/s
 - RAM: 64KB at 600MB/s
-- VRAM: 64KB internal
+- VRAM: 64KB internal at 600MB/s
 
 ## Controls
 
@@ -40,10 +40,10 @@ Uses are optional and simply a recommendation.
 If an action ingame fits a use listed below, you should use it for consistency if possible.
 
 - `Start`: Pause/menu
-- `Select`: Game-related menu (Inventory, weapons, etc.)
+- `Menu`: Game-related menu (Inventory, weapons, etc.)
 - `A`: Primary action (Shoot, attack)
 - `B`: Secondary action (Use, interact)
-- `C`: Mechanic/modifier (Hold to interact with the D-pad)
+- `C`: Mechanic/modifier (Hold to interact with another input/game element)
 - `D-pad`: 4 directional buttons (Movement etc.)
 
 ## Graphics
@@ -56,54 +56,20 @@ Color modes are global across ALL rendering including sprites and the color buff
 
 - `I1`: 1-bit indexed
 - `I4`: 4-bit indexed, index 0 is alpha
-- `I8`: 8-bit indexed, index 0 is alpha
 
 ## Audio
 
-- 8KHz 16-bit samples
-- Channels: 4 (Mono)
+- 6KHz 16-bit samples
+- Channels: 8 (Mono)
 
 # Software
 
-## Syntax
-
-Names can contain `[_a-zA-Z0-9]` but must start with `[_a-zA-Z]`.
-
-Any line beginning with period (`.`) is a preprocesser directive, aka pseudo-op.
-
-Constants are numbers statically compiled (They have no address) and start with `[-0-9]`
-If a constant starts with `0x` it is a hexidecimal number. For example `0x21`.
-If a constant starts with `0o` it is an octal number. For example `0o41`.
-
-Operands can be one of:
-
-- Pointer
-- Register
-- Constant
-
-Operands wrapped in brackets (`[]`) are pointers and are in the format `[ptr]` or `[ptr:offset]`, where `offset` is an offset in bytes from `ptr`.
-
-If an operand starts with greater than sign  (`>`) followed immediately by a type, the operand will be treated as that type, if applicable.
-
-Labels are defined by a valid symbol name with a colon (`:`) appended to it.
-
-If a line has an unescaped pound sign (`#`), the rest of the line is ignored and is a comment.
-
-## Pointers
-
-Pointers are for accessing RAM (Or VRAM, in the case of microcode)
-
-## Data types
-
-Data sizes:
-
-- `nibble`: 4-bit value
-- `byte`: 8-bit value
-- `word`: 16-bit value
-
-Registers have a fixed size and cannot be type cast.
+The language Proto16 uses is a custom language named *Protosembly* and uses the file extension `.p16`.
+Primarily based off x86 Assembly, but draws inspiration from a variety of other flavors.
 
 ### Example syntax
+
+These are *syntax* examples and don't reflect the actual language, such as constants and opcodes.
 
 ```
 .global _start # Keep reference to _start so an external source can enter the program
@@ -116,23 +82,63 @@ message_len:
 
 .segment code
 _start:
-    mov dl, 4 # Random number for now; GPU command index for caching a sprite
-    mov ax, [0x7d3a:0x4b2f] # Pointer to the start of the sprite data in ROM
-    int 7 # Random number; GPU interrupt
-
-    mov dl, 5 # Random number for now; GPU command index for pushing AX to the draw parameters
-    mov ax, 40 # X position of sprite
-    int 7
-    mov ax, 20 # Y position of sprite
-    int 7
-    mov ax, 511 # X scale of sprite (0.0 to 1.0 is mapped as 0-255, negative numbers flip this axis)
-    int 7
-    mov ax, 255 # Y scale of sprite
-    int 7
-
-    mov dl, 6 # Random number for now; GPU command index for drawing a sprite
+    mov dl, 6
     int 7
 ```
+
+## Syntax
+
+Names can contain `[_a-zA-Z0-9]` but must start with `[_a-zA-Z]`.
+
+Any line beginning with period (`.`) is a preprocesser directive, aka pseudo-op. For example `.include "foobar.prs"`
+
+Constants are numbers statically compiled (They have no address) and start with `[-0-9]`
+If a constant starts with `0x` it is a hexidecimal number. For example `0x21`.
+If a constant starts with `0o` it is an octal number. For example `0o41`.
+
+Operands can be one of:
+
+- Pointer
+- Register
+- Constant
+
+Operands wrapped in brackets (`[]`) are pointers. For example `[0xf4a3]`.
+
+If an operand starts with greater than sign  (`>`) followed immediately by a type, the operand will be treated as that type, if applicable. For example `>word`.
+
+Labels are defined by a valid symbol name with a colon (`:`) appended to it. For example `mylabel:`
+
+If a line has an unescaped pound sign (`#`), the rest of the line is ignored and is a comment. For example `# Testing a comment!`
+
+## Pointers
+
+Pointers are for accessing RAM (Or VRAM, in the case of microcode)
+
+## Strings
+
+Types of strings:
+
+- `filestring`: 24 bytes, primarily used for loading data from ROM
+- `string`: One unsigned byte for length, followed by up to 255 characters
+
+## Data types
+
+Data sizes:
+
+- `nibble`: 4-bit value
+- `byte`: 8-bit value
+- `word`: 16-bit value
+
+Registers have a fixed size and cannot be type cast.
+
+## ROM filesystem
+
+Files in ROM are indexed by name.
+
+Names are a filestring and can include `[_-/a-zA-Z0-9]`.
+Since slashes are supported in filenames, you can sort files by directory.
+
+Files have a maximum size of 64KB.
 
 ## Stack
 
@@ -142,7 +148,7 @@ The stack uses LIFO ordering and can hold 128 16-bit values.
 
 ### Data registers
 
-4x 16-bit
+4x 16-bit:
 
 - `AX`
 - `BX`
@@ -162,8 +168,8 @@ The stack uses LIFO ordering and can hold 128 16-bit values.
 
 ### Miscellaneous registers
 
-- `BP` (Stack base pointer; used for subroutine stack state)
 - `SP` (Stack pointer; current stack pointer)
+- `BP` (Stack base pointer; used for subroutine stack state)
 - `IP` (Current instruction address)
 
 ### Flag register
@@ -175,6 +181,25 @@ The stack uses LIFO ordering and can hold 128 16-bit values.
   - 3: `OF` (Overflow flag)
 
   - 8: `DF` (Direction flag)
+
+## Interrupts
+
+Interrupts read data from *DX*, the exact type and what format of the data depends on the interrupt.
+If an interrupt requires a command index it is read from *DL*.
+
+### 0: Console
+
+Command indices:
+
+0. Turn off console
+
+### 1: I/O
+
+Command indices:
+
+0. Load from ROM.
+  - *AX*: Pointer to filestring in RAM
+  - *BX*: Where to put the data in RAM
 
 ## Pseudo-opcodes
 
@@ -229,8 +254,7 @@ No-op.
 
 Interrupt request.
 
-Interrupts read data from *DX*, the exact type and what formt of the data depends on the interrupt.
-If an interrupt requires a secondary command index it is read from *DL*.
+The interrupt index should be a byte.
 
 ### `LEA <dest>, <src>`
 
