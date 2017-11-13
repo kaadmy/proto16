@@ -29,10 +29,12 @@ And has access to VRAM (But not RAM)
 
 ## Memory
 
-- ROM cartridge: 64MB at 300MB/s
+- ROM cartridge: 32MB at 300MB/s
 - Persistent storage: 32KB at 150MB/s
 - RAM: 64KB at 600MB/s
 - VRAM: 64KB internal at 600MB/s
+
+RAM, VRAM, and persistent storage are guaranteed to be zeroed at the start of the program.
 
 ## Controls
 
@@ -118,7 +120,7 @@ Pointers are for accessing RAM (Or VRAM, in the case of microcode)
 
 Types of strings:
 
-- `filestring`: 24 bytes, primarily used for loading data from ROM
+- `filestring`: 16 bytes, primarily used for loading data from ROM
 - `string`: One unsigned byte for length, followed by up to 255 characters
 
 ## Data types
