@@ -25,6 +25,10 @@ void vm_deinit(vm_t *vm) {
   free(vm);
 }
 
+void vm_set_instruction_handler(vm_t *vm, uint8_t opcode, vm_instruction_handler_f handler) {
+  vm->instruction_handlers[opcode] = handler;
+}
+
 void vm_add_mempool(vm_t *vm, vm_mempool_t *mempool) {
   vm->mempools[vm->mempools_num] = mempool;
   vm->mempools_num ++;

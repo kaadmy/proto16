@@ -242,15 +242,15 @@ Pad a chunk of data with zeroes, mainly applicable in the data segment.
 
 Instruction data:
 
+- Byte: operand count
 - Byte: opcode number
-- Byte: number of operands
 - Byte: operand flags (1:ptr/reg/const, 4:size)
-  - Data for operand(s)
+  - Data for operand, word
 - ... additional operands
 
 ### `NOP`
 
-No-op.
+No-op. Uses one instruction cycle.
 
 ### `INT <id>`
 

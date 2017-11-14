@@ -3,6 +3,7 @@
 
 set(VM_SOURCES
   vm.c
+  vm_instruction.c
   vm_mempool.c
   vm_register.c)
 
