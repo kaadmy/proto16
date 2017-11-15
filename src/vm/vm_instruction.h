@@ -7,5 +7,6 @@
 
 void vm_instruction_execute(vm_t *vm);
 
-// NOP
-void vm_instruction_handler_nop(vm_t *vm, vm_instruction_t *instruction);
+// Instruction handlers
+
+void vm_instruction_handler_jmp(vm_t *vm, vm_instruction_t *instruction);

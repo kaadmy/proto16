@@ -13,11 +13,15 @@ vm_mempool_t *vm_mempool_alloc(size_t size) {
   return mempool;
 }
 
-void vm_mempool_free(vm_mempool_t *mempool) {
+void vm_mempool_free(vm_t *vm, vm_mempool_t *mempool) {
   free(mempool->data);
   free(mempool);
 }
 
-void *vm_mempool_get(vm_mempool_t *mempool, size_t index) {
+void *vm_mempool_get(vm_t *vm, vm_mempool_t *mempool, size_t index) {
+  if (index > mempool->size) {
+    vm_error(vm, "Memory pool %d access out of bounds (%d > %d)");
+  }
+
   return (mempool->data + index);
 }

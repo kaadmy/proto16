@@ -63,6 +63,16 @@ void main_init(void) {
   cpu_state.register_dx = vm_register_alloc(SIZE_WORD);
   vm_add_register(cpu_state.vm, cpu_state.register_dx);
 
+  vm_error(0, "well shit");
+
+  // Initialize opcodes
+
+  vm_set_instruction_handler(cpu_state.vm, 1, vm_instruction_handler_jmp);
+
+  // Use test program
+
+  vm_load_test_program(cpu_state.vm);
+
   // "Start" CPU
 
   while (1) {

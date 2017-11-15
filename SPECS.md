@@ -127,7 +127,6 @@ Types of strings:
 
 Data sizes:
 
-- `nibble`: 4-bit value
 - `byte`: 8-bit value
 - `word`: 16-bit value
 
@@ -244,7 +243,7 @@ Instruction data:
 
 - Byte: operand count
 - Byte: opcode number
-- Byte: operand flags (1:ptr/reg/const, 4:size)
+- Byte: operand flags (2:ptr/reg/const, 4:size)
   - Data for operand, word
 - ... additional operands
 

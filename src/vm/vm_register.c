@@ -11,10 +11,10 @@ vm_register_t *vm_register_alloc(uint8_t size) {
   return reg;
 }
 
-void vm_register_free(vm_register_t *reg) {
+void vm_register_free(vm_t *vm, vm_register_t *reg) {
   free(reg);
 }
 
-vm_register_value_t *vm_register_get(vm_register_t *reg) {
+vm_register_value_t *vm_register_get(vm_t *vm, vm_register_t *reg) {
   return &reg->value;
 }

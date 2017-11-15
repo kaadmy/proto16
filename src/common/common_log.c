@@ -16,3 +16,11 @@ void common_log(log_level_t level, char *message) {
 
   printf("%s", message);
 }
+
+void common_logn(log_level_t level, char *message) { // TODO: Remove this when proper inline string formatting works
+  if (level < log_state_s.level) {
+    return;
+  }
+
+  printf("%s\n", message);
+}
