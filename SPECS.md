@@ -148,6 +148,22 @@ The stack uses LIFO ordering and can hold 128 16-bit values.
 
 ## Registers
 
+### Miscellaneous registers
+
+- `IP` (Current instruction address)
+- `SP` (Stack pointer; current stack pointer)
+- `BP` (Stack base pointer; used for subroutine stack state)
+
+### Flag register
+
+- `FLAGS` (16-bit status flags)
+  - 0: `ZF` (Zero flag)
+  - 1: `CF` (Carry flag)
+  - 2: `SF` (Sign flag)
+  - 3: `OF` (Overflow flag)
+
+  - 8: `DF` (Direction flag)
+
 ### Data registers
 
 4x 16-bit:
@@ -167,22 +183,6 @@ The stack uses LIFO ordering and can hold 128 16-bit values.
 - `CH`
 - `DL`
 - `DH`
-
-### Miscellaneous registers
-
-- `SP` (Stack pointer; current stack pointer)
-- `BP` (Stack base pointer; used for subroutine stack state)
-- `IP` (Current instruction address)
-
-### Flag register
-
-- `FLAGS` (16-bit status flags)
-  - 0: `ZF` (Zero flag)
-  - 1: `CF` (Carry flag)
-  - 2: `SF` (Sign flag)
-  - 3: `OF` (Overflow flag)
-
-  - 8: `DF` (Direction flag)
 
 ## Interrupts
 

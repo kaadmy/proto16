@@ -3,7 +3,8 @@
 
 set(COMMON_SOURCES
   common.c
-  log.c)
+  common_endian.c
+  common_log.c)
 
 add_library(common
   ${COMMON_SOURCES})

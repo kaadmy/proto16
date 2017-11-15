@@ -25,6 +25,14 @@ void vm_deinit(vm_t *vm) {
   free(vm);
 }
 
+void vm_cycle(vm_t *vm, uint8_t substeps) {
+  for (uint8_t i = 0; i < substeps; i ++) { // FIXME: Probably a more efficient way to do this?
+    vm_instruction_execute(vm);
+
+  // TODO: Implement CPU timer/delay
+  }
+}
+
 void vm_set_instruction_handler(vm_t *vm, uint8_t opcode, vm_instruction_handler_f handler) {
   vm->instruction_handlers[opcode] = handler;
 }

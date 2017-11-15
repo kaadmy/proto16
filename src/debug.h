@@ -8,9 +8,9 @@
 
 // Debug defines
 
-#define DEBUG_ENABLED
+#define DEBUG_ENABLED 1
 
-#ifdef DEBUG_ENABLED
+#if DEBUG_ENABLED
 #define DEBUG_ASSERT(cond) assert(cond)
 #else
 #define DEBUG_ASSERT(cond)

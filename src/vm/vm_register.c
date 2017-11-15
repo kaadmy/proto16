@@ -6,6 +6,7 @@ vm_register_t *vm_register_alloc(uint8_t size) {
   DEBUG_ASSERT(reg != NULL);
 
   reg->size = size;
+  reg->value.word = 0;
 
   return reg;
 }

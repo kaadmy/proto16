@@ -13,7 +13,6 @@ struct vm_s;
 
 typedef struct {
   uint8_t operand_num;
-
   uint8_t opcode;
   uint8_t *operands;
 } vm_instruction_t;
