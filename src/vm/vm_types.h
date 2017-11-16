@@ -25,6 +25,8 @@ typedef struct {
   uint8_t *operands;
 } vm_instruction_t;
 
+#define VM_INSTRUCTION_SIZE 2 // Minimum fixed size of an instruction; 2 bytes for operand count and opcode
+
 typedef void (*vm_instruction_handler_f) (struct vm_s *vm, vm_instruction_t *instruction);
 
 // Mempool
@@ -50,6 +52,8 @@ typedef struct {
 
 typedef struct vm_s {
   uint32_t clockspeed;
+
+  uint64_t cycles;
 
   vm_instruction_handler_f instruction_handlers[VM_MAX_OPCODES];
 

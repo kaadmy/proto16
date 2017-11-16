@@ -63,7 +63,7 @@ void main_init(void) {
   cpu_state.register_dx = vm_register_alloc(SIZE_WORD);
   vm_add_register(cpu_state.vm, cpu_state.register_dx);
 
-  vm_error(0, "well shit");
+  // TODO: support sub-registers
 
   // Initialize opcodes
 
@@ -85,10 +85,12 @@ void main_deinit(void) {
 }
 
 void main_update(void) {
-  vm_cycle(cpu_state.vm, 1);
+  vm_step(cpu_state.vm, 1);
 }
 
 int main(int argc, char **argv) {
+  common_endian_check(); // Determine system endian
+
   common_log_level(LOG_LEVEL_INFO);
   common_log(LOG_LEVEL_INFO, ENGINE_TITLE " v" ENGINE_VERSION_STRING "\n");
 

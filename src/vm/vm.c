@@ -7,6 +7,8 @@ vm_t *vm_init(uint32_t clockspeed) {
 
   vm->clockspeed = clockspeed;
 
+  vm->cycles = 0;
+
   vm->mempools_num = 0;
   vm->registers_num = 0;
 
@@ -25,11 +27,17 @@ void vm_deinit(vm_t *vm) {
   free(vm);
 }
 
-void vm_cycle(vm_t *vm, uint8_t substeps) {
+void vm_step(vm_t *vm, uint8_t substeps) {
   for (uint8_t i = 0; i < substeps; i ++) { // FIXME: Probably a more efficient way to do this?
+    vm->cycles ++;
+
     vm_instruction_execute(vm);
 
   // TODO: Implement CPU timer/delay
+  }
+
+  if (vm->cycles > 10) { // Run 10 instructions and exit
+    exit(0);
   }
 }
 
