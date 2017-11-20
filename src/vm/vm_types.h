@@ -4,7 +4,9 @@
 // Limits
 
 #define VM_MAX_OPCODES 256 // 256 is the absolute maximum; uint8
+
 #define VM_MAX_MEMPOOLS 32 // 256 is the absolute maximum; uint8
+
 #define VM_MAX_REGISTERS 32 // 256 is the absolute maximum; uint8
 
 // Default indices
@@ -22,10 +24,11 @@ struct vm_s;
 typedef struct {
   uint8_t operand_num;
   uint8_t opcode;
-  uint8_t *operands;
+  uint8_t operands[1];
 } vm_instruction_t;
 
 #define VM_INSTRUCTION_SIZE 2 // Minimum fixed size of an instruction; 2 bytes for operand count and opcode
+#define VM_OPERAND_SIZE 3 // Size in bytes of each operand
 
 typedef void (*vm_instruction_handler_f) (struct vm_s *vm, vm_instruction_t *instruction);
 

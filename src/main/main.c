@@ -85,7 +85,7 @@ void main_deinit(void) {
 }
 
 void main_update(void) {
-  vm_step(cpu_state.vm, 1);
+  vm_step(cpu_state.vm);
 }
 
 int main(int argc, char **argv) {

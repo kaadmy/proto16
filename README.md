@@ -16,6 +16,8 @@ Development time:
 - Nov 11, 2017 (Documentation)
 - Nov 12, 2017 (Development)
 - Nov 14, 2017 (Development)
+- Nov 16, 2017 (Development)
+- Nov 20, 2017 (Development)
 
 Note: When the jam is over, I plan to fork Proto16 into Proto32 as a 32-bit console more akin to 5th gen consoles such as the N64 and PS1.
 

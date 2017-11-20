@@ -1,26 +1,30 @@
 
 #include "vm.h"
 
-void vm_instruction_execute(vm_t *vm) {
+void vm_instruction_next(vm_t *vm, vm_instruction_t *instruction) {
   uint16_t ip = vm_register_get(vm, vm->registers[VM_REGISTER_IP])->word;
 
-  printf("A: %hu\n", ip);
+  ip += VM_INSTRUCTION_SIZE;
+  ip += instruction->operand_num * VM_OPERAND_SIZE;
+
+  vm->registers[VM_REGISTER_IP]->value.word = ip;
+}
+
+void vm_instruction_execute(vm_t *vm) {
+  uint16_t ip = vm_register_get(vm, vm->registers[VM_REGISTER_IP])->word;
 
   vm_instruction_t *instruction = (vm_instruction_t *) vm_mempool_get(vm, vm->mempools[VM_MEMPOOL_RAM], (size_t) ip);
   vm_instruction_handler_f handler = vm->instruction_handlers[instruction->opcode];
 
-  printf("Opcode: %d\n", instruction->opcode);
+  //  printf("[OP=%d IP=%d]\n", instruction->opcode, ip);
 
-  if (handler != NULL) { // Check for an unimplemented or no-op handler
-    handler(vm, instruction);
+  if (handler == NULL) { // Check for an unimplemented or no-op handler
+    vm_instruction_next(vm, instruction);
+
+    return;
   }
 
-  ip += VM_INSTRUCTION_SIZE;
-  ip += instruction->operand_num * 3; // Operand meta (byte) + operand value (word)
-
-  printf("B: %hu\n", ip);
-
-  vm->registers[VM_REGISTER_IP]->value.word = ip;
+  handler(vm, instruction);
 }
 
 // Miscellaneous commonly-used functions
@@ -47,11 +51,11 @@ void vm_instruction_handler_jmp(vm_t *vm, vm_instruction_t *instruction) {
 
   uint16_t ip = vm_register_get(vm, vm->registers[VM_REGISTER_IP])->word;
 
-  printf("IP before jump: %d\n", ip);
+  //  printf(" IP before jump: %d\n", ip);
 
-  ip = vm_helper_get_u16_from_operand(vm, instruction, 0);
+  ip = vm_helper_getopu16(vm, instruction, 0);
 
-  printf("IP after jump: %d\n", ip);
+  //  printf(" IP after jump: %d\n", ip);
 
   vm->registers[VM_REGISTER_IP]->value.word = ip;
 }

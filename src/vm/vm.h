@@ -12,7 +12,7 @@
 vm_t *vm_init(uint32_t clockspeed);
 void vm_deinit(vm_t *vm);
 
-void vm_step(vm_t *vm, uint8_t substeps);
+void vm_step(vm_t *vm);
 
 void vm_set_instruction_handler(vm_t *vm, uint8_t opcode, vm_instruction_handler_f handler);
 void vm_add_mempool(vm_t *vm, vm_mempool_t *mempool);

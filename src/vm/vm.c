@@ -27,16 +27,14 @@ void vm_deinit(vm_t *vm) {
   free(vm);
 }
 
-void vm_step(vm_t *vm, uint8_t substeps) {
-  for (uint8_t i = 0; i < substeps; i ++) { // FIXME: Probably a more efficient way to do this?
-    vm->cycles ++;
+void vm_step(vm_t *vm) {
+  vm->cycles ++;
 
-    vm_instruction_execute(vm);
+  vm_instruction_execute(vm);
 
   // TODO: Implement CPU timer/delay
-  }
 
-  if (vm->cycles > 10) { // Run 10 instructions and exit
+  if (vm->cycles > 30000000) { // Run some instructions and exit
     exit(0);
   }
 }
@@ -65,7 +63,7 @@ void vm_load_test_program(vm_t *vm) {
   data[3] = 0x01; // Opcode: 1
   data[4] = 0x22; // Operand flags: [type:pointer, size:word]
   data[5] = 0x00; // 1st byte of data: 0
-  data[6] = 0x00; // 2nd byte of data: 0
+  data[6] = 0x14; // 2nd byte of data: 255
 }
 
 void vm_error(vm_t *vm, char *message) {

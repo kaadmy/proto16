@@ -3,8 +3,8 @@
 
 // Assignee endian swap functions
 
-uint16_t (*common_endian_big_u16)(uint16_t number);
-uint16_t (*common_endian_native_u16)(uint16_t number);
+uint16_t (*common_endian_tobeu16)(uint16_t number);
+uint16_t (*common_endian_frombeu16)(uint16_t number);
 
 // Endian swap functions
 
@@ -27,10 +27,10 @@ void common_endian_check(void) {
   tester.number = 1;
 
   if (tester.upper == 0) { // Little endian
-    common_endian_big_u16 = u16_swap;
-    common_endian_native_u16 = u16_swap;
+    common_endian_tobeu16 = u16_swap;
+    common_endian_frombeu16 = u16_swap;
   } else { // Big endian
-    common_endian_big_u16 = u16_nop;
-    common_endian_native_u16 = u16_nop;
+    common_endian_tobeu16 = u16_nop;
+    common_endian_frombeu16 = u16_nop;
   }
 }
