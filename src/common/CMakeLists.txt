@@ -2,12 +2,14 @@
 # Setup library
 
 set(COMMON_SOURCES
-  common.c
-  common_endian.c
-  common_log.c)
+  c_color.c
+  c_endian.c
+  c_log.c
+  c_main.c)
 
 add_library(common
   ${COMMON_SOURCES})
 
 target_link_libraries(common
-  m) # Math
+  m # Math
+  dl) # Dynamic libraries

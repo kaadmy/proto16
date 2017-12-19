@@ -5,11 +5,13 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 # Setup binary
 
-set(MAIN_SOURCES
-  main.c)
+set(CLIENT_SOURCES
+  cl_event.c
+  cl_main.c
+  cl_window.c)
 
 add_executable(proto16
-  ${MAIN_SOURCES})
+  ${CLIENT_SOURCES})
 
 target_link_libraries(proto16
   ${COMMON_LIBRARIES}

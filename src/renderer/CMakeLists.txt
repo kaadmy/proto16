@@ -1,13 +1,15 @@
 
 # Include libraries
 
-find_package(SDL2 REQUIRED)
+find_package(PkgConfig REQUIRED)
+
+pkg_search_module(SDL2 REQUIRED sdl2)
 include_directories(${SDL2_INCLUDE_DIRS})
 
 # Setup library
 
 set(RENDERER_SOURCES
-  renderer.c)
+  r_main.c)
 
 add_library(renderer
   ${RENDERER_SOURCES})

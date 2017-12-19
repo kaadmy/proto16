@@ -1,76 +1,61 @@
 
 #pragma once
 
-// Limits
+#include "common/common.h"
 
-#define VM_MAX_OPCODES 256 // 256 is the absolute maximum; uint8
+// Sizes
 
-#define VM_MAX_MEMPOOLS 32 // 256 is the absolute maximum; uint8
+#define VM_MAX_INSTRUCTIONS 256 // Maximum number of instructions; uint16
+#define VM_INSTRUCTION_SIZE 1 // Size of a single instruction in bytes; [instruction:uint8]
+#define VM_INSTRUCTION_DATA_SIZE 2 // Size of instruction data in bytes; [data:uint16]
 
-#define VM_MAX_REGISTERS 32 // 256 is the absolute maximum; uint8
+#define VM_MAX_STACK 21845 // Maximum stack values; uint16 (64KB)
+#define VM_STACK_VALUE_SIZE 3 // Size of a single stack value in bytes; [data:uint16, flags:uint8]
 
-// Default indices
+#define VM_RAM_SIZE 16777216 // RAM footprint; represented as uint32 in code but is limited to uint8 + uint16 (16MB)
 
-#define VM_MEMPOOL_RAM 0 // 0th mempool is RAM
-
-#define VM_REGISTER_IP 0 // 0th register is IP
-
-// Prototypes
+// Prototype
 
 struct vm_s;
 
-// Instructions
+// Stack value
 
 typedef struct {
-  uint8_t operand_num;
-  uint8_t opcode;
-  uint8_t operands[1];
-} vm_instruction_t;
+  uint16_t data;
+  uint8_t flags;
+} vm_stack_value_t;
 
-#define VM_INSTRUCTION_SIZE 2 // Minimum fixed size of an instruction; 2 bytes for operand count and opcode
-#define VM_OPERAND_SIZE 3 // Size in bytes of each operand
-
-typedef void (*vm_instruction_handler_f) (struct vm_s *vm, vm_instruction_t *instruction);
-
-// Mempool
+// State to run a full instruction; can be modified to change program state
+// Basically superfluous since it has access to the VM, but looks nicer and is easier to use
 
 typedef struct {
-  size_t size;
-  void *data;
-} vm_mempool_t;
+  struct vm_s *vm;
 
-// Register
+  uint32_t ip;
 
-typedef union {
-  uint8_t byte; // Byte
-  uint16_t word; // Word
-} vm_register_value_t;
+  uint16_t batch_left; // Remaining instructions left in this execute batch
 
-typedef struct {
-  uint8_t size;
-  vm_register_value_t value;
-} vm_register_t;
+  union {
+    uint8_t byte;
+    int8_t sbyte;
+    uint16_t word;
+    int16_t sword;
+  } data;
+} vm_frame_t;
 
-// VM
+// Instruction handler
+
+typedef void (*vm_instruction_handler_f) (vm_frame_t *frame);
+
+// Main VM state
 
 typedef struct vm_s {
-  uint32_t clockspeed;
+  vm_instruction_handler_f instruction_handlers[VM_MAX_INSTRUCTIONS];
 
-  uint64_t cycles;
+  vm_stack_value_t stack[VM_MAX_STACK];
+  uint16_t stack_ptr;
 
-  vm_instruction_handler_f instruction_handlers[VM_MAX_OPCODES];
+  uint8_t ram[VM_RAM_SIZE];
 
-  vm_mempool_t *mempools[VM_MAX_MEMPOOLS];
-  uint8_t mempools_num;
-
-  vm_register_t *registers[VM_MAX_REGISTERS];
-  uint8_t registers_num;
+  vm_frame_t *frame;
 } vm_t;
-
-// Operand types
-
-typedef enum {
-  VM_OPERAND_TYPE_CONSTANT,
-  VM_OPERAND_TYPE_REGISTER,
-  VM_OPERAND_TYPE_POINTER
-} vm_operand_type_t;

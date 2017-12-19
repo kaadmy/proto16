@@ -1,14 +1,6 @@
 
 #pragma once
 
-#include "vm.h"
+#include "vm_types.h"
 
-// Call the next instruction
-void vm_instruction_execute(vm_t *vm);
-
-// Bump IP and get ready for the next instruction; jumps can't use this
-void vm_instruction_next(vm_t *vm, vm_instruction_t *instruction);
-
-// Instruction handlers
-
-void vm_instruction_handler_jmp(vm_t *vm, vm_instruction_t *instruction);
+void vm_instruction_nop(vm_frame_t *frame);

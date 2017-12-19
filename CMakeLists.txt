@@ -34,7 +34,7 @@ set(RENDERER_LIBRARIES renderer)
 add_subdirectory(src/sound)
 set(SOUND_LIBRARIES sound)
 
-add_subdirectory(src/main)
+add_subdirectory(src/client)
 
 if(${BUILD_TOOLS})
   add_subdirectory(src/tools)

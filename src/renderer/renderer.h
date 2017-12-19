@@ -1,4 +1,5 @@
 
 #pragma once
 
-#include "common/common.h"
+#include "r_main.h"
+#include "r_types.h"

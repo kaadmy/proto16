@@ -2,11 +2,8 @@
 # Setup library
 
 set(VM_SOURCES
-  vm.c
-  vm_helper.c
   vm_instruction.c
-  vm_mempool.c
-  vm_register.c)
+  vm_main.c)
 
 add_library(vm
   ${VM_SOURCES})
