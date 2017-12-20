@@ -12,7 +12,9 @@ static void cl_update(void);
 // Init function
 
 static void cl_init(void) {
-  vm_alloc(cl_global_state.vm);
+  cl_global_state.vm = vm_alloc();
+
+  vm_test_setup(cl_global_state.vm);
 
   if (SDL_Init(0) == -1) {
     c_log(C_LOG_LEVEL_FATAL, "Failed to initialize SDL, aborting\n");
